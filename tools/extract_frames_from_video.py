@@ -1,10 +1,16 @@
-"""
-从视频中按指定时间间隔提取帧并保存为图片存储到对应文件夹中。
+# -*- coding: utf-8 -*-
+'''
+@File    : extract_frames_from_video.py
+@Time    : 2026/01/08 19:49:41
+@Author  : wty-yy
+@Version : 1.0
+@Blog    : https://wty-yy.github.io/posts/4856/
+@Desc    : 从视频中按指定时间间隔提取帧并保存为图片存储到对应文件夹中。
 python extract_frames_from_video.py \
     --video-file g1_dance_demo.mp4 \
     --output-folder g1_dance_demo_frames \
     --start 2 --end 4 --folder-duration 0.2
-"""
+'''
 import os
 import cv2
 import time
@@ -24,12 +30,12 @@ def extract_frames(
     """
     从视频中按指定时间间隔提取帧并保存为图片存储到对应文件夹中, 例如:
         folder_duration=20, start=0, end=60, 则会创建3个文件夹:
-        ```
+
         output_dir/
             1_frame0-19/
             2_frame20-39/
             3_frame40-59/
-        ```
+
         每个文件夹内保存对应时间段的视频帧图片。
 
     Args:

@@ -1,13 +1,30 @@
-"""
-# Extract frames from video using ffmpeg
-python tools/extract_frames_from_video.py  # change video path and output folder inside the script
+# -*- coding: utf-8 -*-
+'''
+@File    : sam2_segment_video.py
+@Time    : 2026/01/08 19:49:22
+@Author  : wty-yy
+@Version : 1.0
+@Blog    : https://wty-yy.github.io/posts/4856/
+@Desc    : 用于对视频帧进行SAM2分割并保存分割结果。
+
+clone SAM2仓库并pip install -e .安装后，还需安装 pip install imageio[ffmpeg]
+
+首先使用extract_frames_from_video.py (参考blog) 从视频中提取帧，然后将该脚本放在SAM2仓库中的tools/目录下，下载SAM2模型
+sam2.1_hiera_base_plus.pt 或 sam2.1_hiera_tiny.pt 到checkpoints文件夹中，最后运行本脚本进行分割。
+
 python tools/sam2_segment_video_extract.py \
     --video-parent-dir /home/yy/Downloads/VID_20251210_094125_frames_30fps \
     --show-prompts \
     --save-mask-video \
     --save-mask-frames \
     --mask-color avg
-"""
+
+--video-parent-dir: 包含视频帧文件夹的父目录, 例如 /path/to/video_frames_parent_dir 下有多个子文件夹, 每个子文件夹内包含对应视频的帧图片。
+--show-prompts: 是否弹出窗口以显示提示点和边界框的可视化。
+--save-mask-video: 是否保存带有分割掩码的视频，保存在`*_masks.mp4`文件夹中。
+--save-mask-frames: 是否保存分割掩码的帧图片，保存在`*_masks`文件夹中，蒙版将用(255,255,255)表示，其他均为(0,0,0)。
+--mask-color: 用于掩码区域的颜色 ('white'表示白色,'avg'表示使用区域的平均颜色)。
+'''
 from pathlib import Path
 
 import os
