@@ -7,12 +7,13 @@
 @Blog    : https://wty-yy.github.io/posts/4856/
 @Desc    : 用于对视频帧进行SAM2分割并保存分割结果。
 
-clone SAM2仓库并pip install -e .安装后，还需安装 pip install imageio[ffmpeg]
+clone SAM2仓库并pip install -e .安装后，还需安装 pip install imageio[ffmpeg] matplotlib
 
-首先使用extract_frames_from_video.py (参考blog) 从视频中提取帧，然后将该脚本放在SAM2仓库中的tools/目录下，下载SAM2模型
+首先使用extract_frames_from_video.py (参考blog) 从视频中提取帧并对关键帧对象打框，
+然后将该脚本放在SAM2仓库中的tools/目录下，下载SAM2模型
 sam2.1_hiera_base_plus.pt 或 sam2.1_hiera_tiny.pt 到checkpoints文件夹中，最后运行本脚本进行分割。
 
-python tools/sam2_segment_video_extract.py \
+python tools/sam2_segment_video.py \
     --video-parent-dir /home/yy/Downloads/VID_20251210_094125_frames_30fps \
     --show-prompts \
     --save-mask-video \
@@ -102,9 +103,13 @@ class SAM2SegmentVideoProcessor:
 
     def init_state(self, video_dir: str):
         self.video_dir = Path(video_dir)
+        try:
+            self.fps = int(self.video_dir.parent.name.split('_')[-1].replace('fps',''))
+        except:
+            self.fps = 30
         self.frames = sorted(Path(video_dir).rglob("*.jpg"))
         self.w, self.h = Image.open(self.frames[0]).size
-        print(f"found {len(self.frames)} frames")
+        print(f"found {len(self.frames)} frames, fps: {self.fps}, frame size: {self.w}x{self.h}")
 
         # Init model
         self.inference_state = self.predictor.init_state(video_path=video_dir)
@@ -177,7 +182,7 @@ class SAM2SegmentVideoProcessor:
             output_dir.mkdir(exist_ok=True, parents=True)
         if self.save_mask_video:
             output_video = self.video_dir.parent / f"{self.video_dir.name}_masked.mp4"
-            writer = imageio.get_writer(output_video, fps=30)
+            writer = imageio.get_writer(output_video, fps=self.fps)
         video_segments = {}
         if self.num_prompts > 0:
             for out_frame_idx, out_obj_ids, out_mask_logits in self.predictor.propagate_in_video(self.inference_state):
